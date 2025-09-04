@@ -1,0 +1,23 @@
+# Google OAuth Configuration
+# Get these from Google Cloud Console: https://console.cloud.google.com/
+GOOGLE_OAUTH2_CLIENT_ID=your-google-client-id-here
+GOOGLE_OAUTH2_SECRET=your-google-client-secret-here
+
+# GitHub OAuth Configuration
+# Get these from GitHub Developer Settings: https://github.com/settings/developers
+GITHUB_OAUTH2_CLIENT_ID=your-github-client-id-here
+GITHUB_OAUTH2_SECRET=your-github-client-secret-here
+
+# Django Settings
+SECRET_KEY=your-django-secret-key-here
+DEBUG=True
+
+# Database Configuration
+DB_NAME=fbackend
+DB_USER=dbadmin
+DB_PASSWORD=1234
+DB_HOST=localhost
+
+# CORS Settings
+ALLOWED_HOSTS=209.97.164.73,jackieng.hk,127.0.0.1,localhost,backend.jackieng.hk,test.jackieng.hk
+

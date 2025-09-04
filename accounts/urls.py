@@ -1,0 +1,16 @@
+# account/urls.py
+from django.urls import path
+from . import views
+from . import social_views
+
+urlpatterns = [
+    
+    path('register/', views.register, name='register'),
+    path('login/', views.user_login, name='login'),
+    path('logout/', views.user_logout, name='logout'),
+    
+    path('api/google-login/', social_views.google_login, name='google_login'),
+    path('api/google-auth-url/', social_views.google_auth_url, name='google_auth_url'),
+    path('api/github-login/', social_views.github_login, name='github_login'),
+    path('api/github-auth-url/', social_views.github_auth_url, name='github_auth_url'),
+]

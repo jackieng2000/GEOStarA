@@ -1,0 +1,61 @@
+Technology stack
+
+git
+github
+
+Frontend - Development
+--------
+Vite + React Framework
+axios
+localStorage in React to store the GPS position of user and other users  
+javascript
+vscode
+
+
+Backend - Development
+-------
+Ubuntu 24.04
+Python 3.12.4
+html
+css
+Postgres 16
+zsh  
+ohmyzsh
+prowerlevel9
+VScode 
+Django 4.2, 
+Bootstrap 5.3.3, 
+Font Awesome 6.5.2,
+Project Directory = home/jackieng/GPSInfo-BackEnd
+
+virtualenv
+Name of the virtualenv : genv
+asgiref  3.9.1
+Django   4.2
+pillow   11.3.0
+pip      25.1.1
+psycopg2 2.9.10
+sqlparse 0.5.3
+django-cors-headers
+Django REST Framework (DRF) for RESTful endpoints
+
+Guidelines:
+All the link to css and js will be put in base.html
+the js script specific to the project, is in GEOStar.js
+
+
+Production
+DigitalOcean Droplet
+Domain name : jackieng.hk
+nginx and gunicorn
+frontEnd and backend initially not use web sever nginx 
+Frontend Project Directory = home/jackieng/GPSInfo-FrontEnd
+Backend Project Directory = home/jackieng/GPSInfo-BackEnd
+
+System Function
+Data Model: A GPSLocation model with fields like latitude, longitude, and timestamp, serialized to JSON.
+
+The frontend is on mobile phone. 
+The GPSLocation will be stored every 15sec in localStorage by standard map component and 
+the data will be send to backend through django restful api gateway every 15 sec for recording
+Another function will call the backend to send out the latest position of all users.

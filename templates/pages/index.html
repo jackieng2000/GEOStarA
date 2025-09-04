@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}GEOStar{% endblock %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <h1>You are in index.html (authenticated)</h1>
+        <p>Welcome, {{ user.username }}! Access your GPS tracking features here.</p>
+        <h2>Your Profile</h2>
+        <ul>
+            <li><strong>Username:</strong> {{ user.username }}</li>
+            <li><strong>Email:</strong> {{ user.email }}</li>
+            {% if user.userprofile %}
+                <li><strong>Phone:</strong> {{ user.userprofile.Phone|default:"Not set" }}</li>
+            {% else %}
+                <li><strong>Phone:</strong> Not set</li>
+            {% endif %}
+            {% if user.profile %}
+                <li><strong>User Group:</strong> {{ user.profile.userGroup|default:"Not set" }}</li>
+                <li><strong>Activity Date:</strong> {{ user.profile.activityDate|date:"Y-m-d"|default:"Not set" }}</li>
+            {% else %}
+                <li><strong>User Group:</strong> Not set</li>
+                <li><strong>Activity Date:</strong> Not set</li>
+            {% endif %}
+        </ul>
+        <!-- Add links to GPS features or React integration here -->
+    {% else %}
+        <br>
+        <br>
+        <br>
+        <h1>You are in index.html (not authenticated)</h1>
+        <br>
+        <p>Welcome to GEOStar, your platform for real-time GPS tracking and location sharing.</p>
+        <p>Please <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register' %}">register</a> to get started.</p>
+    {% endif %}
+{% endblock %}
