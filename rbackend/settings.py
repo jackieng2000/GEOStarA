@@ -20,7 +20,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-fallback-key-for-dev'
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = ['209.97.164.73', 'jackieng.hk','127.0.0.1',
- 'localhost','backend.jackieng.hk', 'test.jackieng.hk']
+ 'localhost','backend.jackieng.hk', 'test.jackieng.hk','192.168.1.114']
 
 # Application definition
 INSTALLED_APPS = [
@@ -103,6 +103,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                  # Add your custom context processor
+                'accounts.context_processors.user_registration_info',
             ],
         },
     },
@@ -114,7 +116,7 @@ WSGI_APPLICATION = 'rbackend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='geoinf_db'),
+        'NAME': config('DB_NAME', default='geoinfo_db'),
         'USER': config('DB_USER', default='dbadmin'),
         'PASSWORD': config('DB_PASSWORD', default='1234'),
         'HOST': config('DB_HOST', default='localhost'),
@@ -151,13 +153,22 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
 
 # Allauth settings
-ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+# Add these new settings for better email verification flow
+ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True  # Require email confirmation during signup
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3  # Email confirmation link validity
+ACCOUNT_EMAIL_SUBJECT_PREFIX = 'GEOStar.hk'  # Customize email subject
+ACCOUNT_MAX_EMAIL_ADDRESSES = 2  # Limit number of email addresses per account
 
 # Social account settings
 SOCIALACCOUNT_EMAIL_REQUIRED = False
@@ -178,29 +189,23 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # Login/Logout URLs
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = 'account_login'
 LOGIN_REDIRECT_URL = 'pages:index'  # Redirect to your index page after login
 LOGOUT_REDIRECT_URL = 'pages:index'
-
-
 ACCOUNT_LOGOUT_REDIRECT_URL = 'pages:index'  # Redirect to index after logout
 
 # Optional: Customize the login URL if needed
 #LOGIN_URL = 'account_login'
 
 
-# Email configuration
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# If you're having issues with the decouple config, create a .env file:
-# Create a file named .env in your project root with:
-# SECRET_KEY=your-real-secret-key-here
-# DEBUG=True
-# DB_NAME=geoinf_db
-# DB_USER=dbadmin
-# DB_PASSWORD=1234
-# DB_HOST=localhost
-# GOOGLE_OAUTH2_CLIENT_ID=your-google-client-id
-# GOOGLE_OAUTH2_SECRET=your-google-secret
-# GITHUB_OAUTH2_CLIENT_ID=your-github-client-id
-# GITHUB_OAUTH2_SECRET=your-github-secret
+# Email configuration - UPDATE FOR PRODUCTION (currently using console backend)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# For production, use SMTP:
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'jackieng5000@gmail.com'
+EMAIL_HOST_PASSWORD = 'xgei huhu vyco eqwk'
+DEFAULT_FROM_EMAIL='noreply@jackieng.hk'

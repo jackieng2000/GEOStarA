@@ -1,13 +1,14 @@
-# app/models.py
+# gpsinfo/models.py
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 class GPSLocation(models.Model):
     """
     Stores a user's GPS location at a specific moment in time.
     """
     user = models.ForeignKey(
-        User, 
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='gps_locations',
         help_text="The user associated with this GPS location.",
@@ -43,15 +44,17 @@ class GPSLocation(models.Model):
         verbose_name_plural = 'GPS Locations'
 
     def __str__(self):
-        return f"{self.user.username} at ({self.latitude}, {self.longitude}) on {self.timestamp}"
-# Create your models here.
+        if self.user:
+            # Use username instead of email for display
+            return f"{self.user.username} at ({self.latitude}, {self.longitude}) on {self.timestamp}"
+        return f"Unknown user at ({self.latitude}, {self.longitude}) on {self.timestamp}"
 
 class GPSLatest(models.Model):
     """
     Stores the most recent GPS location for each user.
     """
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='gps_latest',
         help_text="The user associated with this latest GPS location.",
@@ -83,4 +86,5 @@ class GPSLatest(models.Model):
         verbose_name_plural = 'Latest GPS Locations'
 
     def __str__(self):
+        # Use username instead of email for display
         return f"{self.user.username}'s latest at ({self.latitude}, {self.longitude}) on {self.timestamp}"
