@@ -7,9 +7,10 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# OAuth Configuration (make sure these environment variables are set)
+# OAuth Configuration
 GOOGLE_OAUTH2_CLIENT_ID = config('GOOGLE_OAUTH2_CLIENT_ID', default='')
 GOOGLE_OAUTH2_SECRET = config('GOOGLE_OAUTH2_SECRET', default='')
+GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/api/auth/google/'
 GITHUB_OAUTH2_CLIENT_ID = config('GITHUB_OAUTH2_CLIENT_ID', default='')
 GITHUB_OAUTH2_SECRET = config('GITHUB_OAUTH2_SECRET', default='')
 
@@ -19,8 +20,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-fallback-key-for-dev'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['209.97.164.73', 'jackieng.hk','127.0.0.1',
- 'localhost','backend.jackieng.hk', 'test.jackieng.hk','192.168.1.114']
+ALLOWED_HOSTS = ['209.97.164.73', 'jackieng.hk', '127.0.0.1', 'localhost', 'backend.jackieng.hk', 'test.jackieng.hk', '192.168.1.114']
 
 # Application definition
 INSTALLED_APPS = [
@@ -31,10 +31,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -59,7 +59,7 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
-# REST Framework Configuration (only once)
+# REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -67,9 +67,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'UNAUTHENTICATED_USER': None,
 }
 
-# JWT Configuration (only once)
+# JWT Configuration
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
@@ -80,15 +81,34 @@ SIMPLE_JWT = {
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8001",
     "http://localhost:8000",
-    "http://209.97.164.73:5173",
     "http://localhost:5173",
+    "http://209.97.164.73:5173",
     "https://jackieng.hk",
     "https://www.jackieng.hk",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False  # Set to False for security; True was for debugging
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'rbackend.urls'
 
@@ -103,7 +123,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                  # Add your custom context processor
                 'accounts.context_processors.user_registration_info',
             ],
         },
@@ -116,18 +135,16 @@ WSGI_APPLICATION = 'rbackend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='geoinfo_db'),
-        'USER': config('DB_USER', default='dbadmin'),
-        'PASSWORD': config('DB_PASSWORD', default='1234'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default=''),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        # 'PORT': config('DB_PORT'),
     }
 }
 
 # Password validation
-AUTH_PASSWORD_VALIDATORS = [
-    # Commented out for development
-]
+AUTH_PASSWORD_VALIDATORS = []
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
@@ -148,13 +165,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Django Allauth Configuration
 SITE_ID = 1
 
-# Authentication backends
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
-AUTH_USER_MODEL = 'accounts.CustomUser'
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Allauth settings
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
@@ -163,12 +179,10 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-
-# Add these new settings for better email verification flow
-ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True  # Require email confirmation during signup
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3  # Email confirmation link validity
-ACCOUNT_EMAIL_SUBJECT_PREFIX = 'GEOStar.hk'  # Customize email subject
-ACCOUNT_MAX_EMAIL_ADDRESSES = 2  # Limit number of email addresses per account
+ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_EMAIL_SUBJECT_PREFIX = 'GEOStar.hk'
+ACCOUNT_MAX_EMAIL_ADDRESSES = 2
 
 # Social account settings
 SOCIALACCOUNT_EMAIL_REQUIRED = False
@@ -176,36 +190,74 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
-# Social OAuth providers
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
-        'OAUTH_PKCE_ENABLED': True,
-    },
-    'github': {
-        'SCOPE': ['user:email'],
-    }
-}
+# # Social OAuth providers
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'APP': {
+#             'client_id': GOOGLE_OAUTH2_CLIENT_ID,
+#             'secret': GOOGLE_OAUTH2_SECRET,
+#         },
+#         'SCOPE': ['profile', 'email'],
+#         'AUTH_PARAMS': {'access_type': 'online'},
+#         'OAUTH_PKCE_ENABLED': True,
+#     },
+#     'github': {
+#         'APP': {
+#             'client_id': GITHUB_OAUTH2_CLIENT_ID,
+#             'secret': GITHUB_OAUTH2_SECRET,
+#         },
+#         'SCOPE': ['user:email'],
+#     }
+# }
 
 # Login/Logout URLs
 LOGIN_URL = 'account_login'
-LOGIN_REDIRECT_URL = 'pages:index'  # Redirect to your index page after login
+LOGIN_REDIRECT_URL = 'pages:index'
 LOGOUT_REDIRECT_URL = 'pages:index'
-ACCOUNT_LOGOUT_REDIRECT_URL = 'pages:index'  # Redirect to index after logout
+ACCOUNT_LOGOUT_REDIRECT_URL = 'pages:index'
 
-# Optional: Customize the login URL if needed
-#LOGIN_URL = 'account_login'
-
-
-
-# Email configuration - UPDATE FOR PRODUCTION (currently using console backend)
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# For production, use SMTP:
+# Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'jackieng5000@gmail.com'
 EMAIL_HOST_PASSWORD = 'xgei huhu vyco eqwk'
-DEFAULT_FROM_EMAIL='noreply@jackieng.hk'
+DEFAULT_FROM_EMAIL = 'noreply@jackieng.hk'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'accounts': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

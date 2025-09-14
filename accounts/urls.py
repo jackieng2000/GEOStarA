@@ -4,6 +4,8 @@ from . import views
 from . import social_views
 from .views import EmailConfHelpView
 
+app_name = 'accounts'
+
 urlpatterns = [
     
     # path('register/', views.register, name='register'),
