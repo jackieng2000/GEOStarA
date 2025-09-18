@@ -11,8 +11,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 GOOGLE_OAUTH2_CLIENT_ID = config('GOOGLE_OAUTH2_CLIENT_ID', default='')
 GOOGLE_OAUTH2_SECRET = config('GOOGLE_OAUTH2_SECRET', default='')
 GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/api/auth/google/'
+
 GITHUB_OAUTH2_CLIENT_ID = config('GITHUB_OAUTH2_CLIENT_ID', default='')
 GITHUB_OAUTH2_SECRET = config('GITHUB_OAUTH2_SECRET', default='')
+ALLOWED_GITHUB_REDIRECT_URIS = [
+    'http://localhost:5173/geo_pages1/login',
+    'http://jackieng.hk/geo_pages1/login',
+    'http://localhost:8000/api/auth/github/',
+    'http://jackieng.hk/api/auth/github/',
+    ]
 
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-fallback-key-for-dev')
@@ -20,7 +27,9 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-fallback-key-for-dev'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['209.97.164.73', 'jackieng.hk', '127.0.0.1', 'localhost', 'backend.jackieng.hk', 'test.jackieng.hk', '192.168.1.114']
+ALLOWED_HOSTS = ['209.97.164.73', 'jackieng.hk', '127.0.0.1',
+                 'localhost', 'backend.jackieng.hk', 'test.jackieng.hk', 
+                 '192.168.1.114', 'localhost:8000', 'localhost:5173',]
 
 # Application definition
 INSTALLED_APPS = [
@@ -67,6 +76,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    # This ensures unauthenticated responses are handled properly
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
     'UNAUTHENTICATED_USER': None,
 }
 
@@ -78,17 +89,43 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
     'UPDATE_LAST_LOGIN': False,
 }
+# settings.py
+
+# Frontend URL
+FRONTEND_URL = 'http://localhost:5173'
+
+# Password reset configuration
+ACCOUNT_EMAIL_CONFIRMATION_URL = FRONTEND_URL + '/geo_pages1/confirm-email/{0}'
+ACCOUNT_PASSWORD_RESET_CONFIRM = FRONTEND_URL + '/geo_pages1/password-reset-confirm/{uidb64}/{token}'
+
+# If you're using a custom adapter for password reset
+#ACCOUNT_ADAPTER = 'yourapp.adapters.CustomAccountAdapter'
+
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "http://209.97.164.73:5173",
     "https://jackieng.hk",
     "https://www.jackieng.hk",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = False  # Set to False for security; True was for debugging
+# For CSRF protection with AJAX requests
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+]
+
+# CSRF cookie settings
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_SAMESITE = 'Lax'  # or 'None' if using HTTPS
+
+CORS_ALLOW_ALL_ORIGINS = True  # Set to False for security; True was for debugging
+
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
@@ -109,6 +146,9 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# Or completely disable CSRF for API views (NOT RECOMMENDED)
+CSRF_EXEMPT_URLS = ['localhost:8000/api/auth/password/reset/']
 
 ROOT_URLCONF = 'rbackend.urls'
 
@@ -174,15 +214,17 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Allauth settings
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
-ACCOUNT_EMAIL_REQUIRED = True
+
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_EMAIL_SUBJECT_PREFIX = 'GEOStar.hk'
 ACCOUNT_MAX_EMAIL_ADDRESSES = 2
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'  # Use 'https' in production
 
 # Social account settings
 SOCIALACCOUNT_EMAIL_REQUIRED = False
